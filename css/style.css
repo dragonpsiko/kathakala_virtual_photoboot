@@ -1,0 +1,273 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f7f4f0;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px 15px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  font-family: 'Georgia', serif;
+  font-size: 1.8rem;
+  color: #4a3b32;
+}
+
+header p {
+  font-size: 0.85rem;
+  color: #7a6a5d;
+  margin-top: 4px;
+}
+
+/* --- LAYAR 1: PILIHAN FRAME --- */
+#selection-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 380px;
+}
+
+.section-title {
+  font-size: 1rem;
+  color: #4a3b32;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.frame-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.frame-card {
+  background: #ffffff;
+  border: 3px solid transparent;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.frame-card.selected {
+  border-color: #8c6d58;
+  background-color: #f2ece6;
+  transform: translateY(-2px);
+}
+
+.frame-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #e2d7cd;
+}
+
+.frame-card span {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a3b32;
+}
+
+/* --- LAYAR 2: BOOTH / KAMERA --- */
+#booth-screen {
+  display: none;
+  width: 100%;
+  max-width: 340px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.booth-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3.3;
+  background-color: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+/* Dynamic Filter Styles (Live Preview Webcam) */
+.filter-normal { filter: none; }
+.filter-beauty { filter: brightness(1.12) contrast(0.98) saturate(1.08) sepia(0.05); }
+.filter-radiant { filter: brightness(1.15) contrast(1.02) saturate(1.15) hue-rotate(-5deg); }
+.filter-fuji_astia { filter: brightness(1.04) saturate(1.08); }
+.filter-bw { filter: grayscale(100%) contrast(120%); }
+.filter-vintage { filter: sepia(50%) contrast(105%) brightness(95%); }
+.filter-bright { filter: brightness(115%) contrast(105%); }
+.filter-y2k { filter: saturate(160%) contrast(125%); }
+
+/* Flash Effect */
+.flash-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.15s ease-out;
+}
+
+.flash-overlay.active {
+  opacity: 1;
+}
+
+.timer-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 10;
+}
+
+.timer-number {
+  font-size: 5.5rem;
+  font-weight: bold;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.pose-indicator {
+  font-size: 0.95rem;
+  margin-top: 5px;
+  background: #8c6d58;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+/* Pilihan Filter UI (Scrollable) */
+.filter-selector {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+  scrollbar-width: thin;
+}
+
+.filter-btn {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  border-radius: 15px;
+  background: #e2d7cd;
+  color: #4a3b32;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.filter-btn.active {
+  background: #8c6d58;
+  color: white;
+  border-color: #4a3b32;
+}
+
+.controls {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+button, .btn-action {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-main {
+  background-color: #8c6d58;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #e2d7cd;
+  color: #4a3b32;
+}
+
+/* --- LAYAR 3: HASIL --- */
+#result-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+}
+
+canvas {
+  display: none;
+}
+
+#photo-result {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.btn-download {
+  background-color: #2e7d32;
+  color: white;
+  margin-top: 15px;
+  display: block;
+  width: 100%;
+}
+
+.btn-retake {
+  background-color: #d32f2f;
+  color: white;
+  margin-top: 8px;
+  width: 100%;
+}
+
+#upload-status {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #666;
+}
