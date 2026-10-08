@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kathakala Photobooth - Boarding Pass 3 Pose</title>
+  <title>Kathakala Photobooth - Multi Frame & Filters</title>
   <style>
     * {
       box-sizing: border-box;
@@ -24,12 +24,12 @@
 
     header {
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     header h1 {
       font-family: 'Georgia', serif;
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       color: #4a3b32;
     }
 
@@ -39,11 +39,78 @@
       margin-top: 4px;
     }
 
-    /* Kamera dibuat fokus 1 kotak (rasio pas 4:3) */
+    /* --- LAYAR 1: PILIHAN FRAME --- */
+    #selection-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      color: #4a3b32;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .frame-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .frame-card {
+      background: #ffffff;
+      border: 3px solid transparent;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .frame-card.selected {
+      border-color: #8c6d58;
+      background-color: #f2ece6;
+      transform: translateY(-2px);
+    }
+
+    .frame-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #e2d7cd;
+    }
+
+    .frame-card span {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #4a3b32;
+    }
+
+    /* --- LAYAR 2: BOOTH / KAMERA --- */
+    #booth-screen {
+      display: none;
+      width: 100%;
+      max-width: 340px;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .booth-container {
       position: relative;
       width: 100%;
-      max-width: 340px;
       aspect-ratio: 4 / 3.3;
       background-color: #000;
       border-radius: 16px;
@@ -61,7 +128,14 @@
       transform: scaleX(-1);
     }
 
-    /* Animasi Flash Efek Jepret */
+    /* Dynamic Filter Styles */
+    .filter-normal { filter: none; }
+    .filter-bw { filter: grayscale(100%) contrast(120%); }
+    .filter-vintage { filter: sepia(50%) contrast(105%) brightness(95%); }
+    .filter-bright { filter: brightness(115%) contrast(105%); }
+    .filter-y2k { filter: saturate(160%) contrast(125%); }
+
+    /* Flash Effect */
     .flash-overlay {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -78,10 +152,7 @@
 
     .timer-overlay {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.4);
       display: none;
       flex-direction: column;
@@ -98,7 +169,7 @@
     }
 
     .pose-indicator {
-      font-size: 1rem;
+      font-size: 0.95rem;
       margin-top: 5px;
       background: #8c6d58;
       color: #fff;
@@ -107,15 +178,42 @@
       font-weight: 600;
     }
 
+    /* Pilihan Filter UI */
+    .filter-selector {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      margin-top: 12px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+
+    .filter-btn {
+      flex: 0 0 auto;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      border-radius: 15px;
+      background: #e2d7cd;
+      color: #4a3b32;
+      border: 2px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .filter-btn.active {
+      background: #8c6d58;
+      color: white;
+      border-color: #4a3b32;
+    }
+
     .controls {
-      margin-top: 15px;
+      margin-top: 12px;
       display: flex;
       gap: 10px;
       width: 100%;
-      max-width: 340px;
     }
 
-    button {
+    button, .btn-action {
       flex: 1;
       padding: 12px;
       border: none;
@@ -123,20 +221,22 @@
       font-weight: 600;
       font-size: 0.95rem;
       cursor: pointer;
+      text-align: center;
+      text-decoration: none;
     }
 
-    .btn-capture {
+    .btn-main {
       background-color: #8c6d58;
       color: white;
     }
 
-    .btn-switch {
+    .btn-secondary {
       background-color: #e2d7cd;
       color: #4a3b32;
-      flex: 0.35;
     }
 
-    .result-container {
+    /* --- LAYAR 3: HASIL --- */
+    #result-screen {
       display: none;
       flex-direction: column;
       align-items: center;
@@ -158,19 +258,15 @@
       background-color: #2e7d32;
       color: white;
       margin-top: 15px;
-      text-decoration: none;
-      text-align: center;
       display: block;
       width: 100%;
-      padding: 12px;
-      border-radius: 25px;
-      font-weight: 600;
     }
 
     .btn-retake {
       background-color: #d32f2f;
       color: white;
       margin-top: 8px;
+      width: 100%;
     }
 
     #upload-status {
@@ -187,9 +283,43 @@
     <p>Virtual Photobooth — Scan, Snap & Download</p>
   </header>
 
+  <!-- LAYAR 1: PILIH DESAIN FRAME -->
+  <div id="selection-screen">
+    <div class="section-title">Pilih Desain Frame:</div>
+    
+    <div class="frame-grid">
+      <!-- Frame 1: Boarding Pass -->
+      <div class="frame-card selected" onclick="selectFrame('boarding_pass', this)">
+        <img src="frame.png" alt="Boarding Pass" onerror="this.src='frame.png'">
+        <span>Boarding Pass</span>
+      </div>
+
+      <!-- Frame 2: Movie Ticket -->
+      <div class="frame-card" onclick="selectFrame('movie_ticket', this)">
+        <img src="frame2.png" alt="Movie Ticket" onerror="this.src='frame.png'">
+        <span>Movie Ticket</span>
+      </div>
+
+      <!-- Frame 3: Kathakala Mart -->
+      <div class="frame-card" onclick="selectFrame('kathakala_mart', this)">
+        <img src="frame3.png" alt="Kathakala Mart" onerror="this.src='frame.png'">
+        <span>Kathakala Mart</span>
+      </div>
+
+      <!-- Frame 4: Y2K Anti-Design -->
+      <div class="frame-card" onclick="selectFrame('y2k_antidesign', this)">
+        <img src="frame4.png" alt="Y2K Anti-Design" onerror="this.src='frame.png'">
+        <span>Y2K Style</span>
+      </div>
+    </div>
+
+    <button class="btn-main" style="width: 100%;" onclick="goToBooth()">Lanjut ke Kamera 📸</button>
+  </div>
+
+  <!-- LAYAR 2: KAMERA & FITUR FILTER -->
   <div id="booth-screen">
     <div class="booth-container">
-      <video id="webcam" autoplay playsinline></video>
+      <video id="webcam" class="filter-normal" autoplay playsinline></video>
       <div id="flash" class="flash-overlay"></div>
       
       <div id="timer-overlay" class="timer-overlay">
@@ -198,15 +328,26 @@
       </div>
     </div>
 
-    <div class="controls">
-      <button class="btn-switch" id="btn-flip" onclick="switchCamera()">🔄 Flip</button>
-      <button class="btn-capture" id="btn-start" onclick="startMultiPoseSession()">📸 Mulai (3 Pose)</button>
+    <!-- Pilihan Filter -->
+    <div class="filter-selector">
+      <button class="filter-btn active" onclick="setFilter('normal', this)">Normal</button>
+      <button class="filter-btn" onclick="setFilter('bw', this)">B&W Noir</button>
+      <button class="filter-btn" onclick="setFilter('vintage', this)">Vintage</button>
+      <button class="filter-btn" onclick="setFilter('bright', this)">Bright</button>
+      <button class="filter-btn" onclick="setFilter('y2k', this)">Y2K Vivid</button>
     </div>
+
+    <div class="controls">
+      <button class="btn-secondary" style="flex: 0.35;" id="btn-flip" onclick="switchCamera()">🔄 Flip</button>
+      <button class="btn-main" id="btn-start" onclick="startMultiPoseSession()">📸 Mulai (3 Pose)</button>
+    </div>
+    <button class="btn-secondary" style="margin-top: 10px; width: 100%;" onclick="backToSelection()">⬅️ Ganti Frame</button>
   </div>
 
-  <div id="result-screen" class="result-container">
+  <!-- LAYAR 3: HASIL FOTO -->
+  <div id="result-screen">
     <img id="photo-result" alt="Hasil Foto">
-    <a id="download-link" class="btn-download" download="kathakala-boardingpass.jpg">📥 Simpan Foto</a>
+    <a id="download-link" class="btn-action btn-download" download="kathakala-photobooth.jpg">📥 Simpan Foto</a>
     <button class="btn-retake" onclick="resetPhoto()">🔄 Foto Ulang</button>
     <p id="upload-status"></p>
   </div>
@@ -214,13 +355,64 @@
   <canvas id="canvas"></canvas>
 
   <script>
+    // DATA KONFIGURASI 4 FRAME
+    const FRAME_CONFIGS = {
+      "boarding_pass": {
+        name: "Boarding Pass",
+        src: "frame.png",
+        posesCount: 3,
+        renderWidth: 1080,
+        renderHeight: 3240,
+        slots: [
+          { x: 43.1, y: 140.4,  w: 993.8, h: 827.9 },
+          { x: 43.1, y: 1012.7, w: 993.8, h: 827.9 },
+          { x: 43.1, y: 1885.0, w: 993.8, h: 827.9 }
+        ]
+      },
+      "movie_ticket": {
+        name: "Movie Ticket",
+        src: "frame2.png",
+        posesCount: 3,
+        renderWidth: 1080,
+        renderHeight: 3240,
+        slots: [
+          { x: 70.9, y: 592.3,  w: 933.6, h: 732.9 },
+          { x: 70.9, y: 1356.2, w: 933.6, h: 732.9 },
+          { x: 70.9, y: 2120.1, w: 933.6, h: 732.9 }
+        ]
+      },
+      "kathakala_mart": {
+        name: "Kathakala Mart",
+        src: "frame3.png",
+        posesCount: 3,
+        renderWidth: 1080,
+        renderHeight: 3240,
+        slots: [
+          { x: 36.4, y: 512.6,  w: 1010.4, h: 828.3 },
+          { x: 36.4, y: 1370.9, w: 1010.4, h: 828.3 },
+          { x: 36.4, y: 2229.3, w: 1010.4, h: 828.3 }
+        ]
+      },
+      "y2k_antidesign": {
+        name: "Y2K Style",
+        src: "frame4.png",
+        posesCount: 3,
+        renderWidth: 1080,
+        renderHeight: 3240,
+        slots: [
+          { x: 52.7, y: 108.0,   w: 974.6, h: 790.2 },
+          { x: 46.7, y: 953.9,   w: 974.6, h: 790.2 },
+          { x: 46.7, y: 1800.2,  w: 974.6, h: 790.2 }
+        ]
+      }
+    };
+
     const video = document.getElementById('webcam');
     const canvas = document.getElementById('canvas');
-    const frameImg = new Image();
-    frameImg.src = "frame.png"; // Frame PNG transparan tetap dimuat di background JS
-    
     const photoResult = document.getElementById('photo-result');
     const downloadLink = document.getElementById('download-link');
+    
+    const selectionScreen = document.getElementById('selection-screen');
     const boothScreen = document.getElementById('booth-screen');
     const resultScreen = document.getElementById('result-screen');
     const uploadStatus = document.getElementById('upload-status');
@@ -236,6 +428,40 @@
     let currentStream = null;
     let facingMode = "user";
     let capturedPoses = [];
+    let selectedFrameKey = "boarding_pass";
+    let activeFilter = "normal";
+    let activeFrameImg = new Image();
+
+    function selectFrame(key, cardElement) {
+      selectedFrameKey = key;
+      document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('selected'));
+      cardElement.classList.add('selected');
+    }
+
+    function setFilter(filterType, btnElement) {
+      activeFilter = filterType;
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+
+      video.className = `filter-${filterType}`;
+    }
+
+    function goToBooth() {
+      const config = FRAME_CONFIGS[selectedFrameKey];
+      activeFrameImg.src = config.src;
+      
+      selectionScreen.style.display = "none";
+      boothScreen.style.display = "flex";
+      startCamera();
+    }
+
+    function backToSelection() {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
+      boothScreen.style.display = "none";
+      selectionScreen.style.display = "flex";
+    }
 
     async function startCamera() {
       if (currentStream) {
@@ -277,22 +503,21 @@
       btnFlip.disabled = true;
       timerOverlay.style.display = "flex";
 
-      for (let poseIndex = 1; poseIndex <= 3; poseIndex++) {
-        poseIndicator.innerText = `Pose ${poseIndex} dari 3`;
+      const config = FRAME_CONFIGS[selectedFrameKey];
+
+      for (let poseIndex = 1; poseIndex <= config.posesCount; poseIndex++) {
+        poseIndicator.innerText = `Pose ${poseIndex} dari ${config.posesCount}`;
         
-        // Hitung mundur 3, 2, 1
         for (let count = 3; count > 0; count--) {
           timerNumber.innerText = count;
           await delay(1000);
         }
 
-        // Ambil Foto
         timerNumber.innerText = "📸";
         await triggerFlash();
         captureSingleFrame();
 
-        // Jeda waktu antar pose (1.2 detik) agar pengguna sempat ganti gaya
-        if (poseIndex < 3) {
+        if (poseIndex < config.posesCount) {
           poseIndicator.innerText = "Ganti Pose Berikutnya!";
           await delay(1200);
         }
@@ -316,6 +541,19 @@
       tempCanvas.width = video.videoWidth;
       tempCanvas.height = video.videoHeight;
 
+      // Filter visual ke canvas
+      if (activeFilter === 'bw') {
+        tempCtx.filter = 'grayscale(100%) contrast(120%)';
+      } else if (activeFilter === 'vintage') {
+        tempCtx.filter = 'sepia(50%) contrast(105%) brightness(95%)';
+      } else if (activeFilter === 'bright') {
+        tempCtx.filter = 'brightness(115%) contrast(105%)';
+      } else if (activeFilter === 'y2k') {
+        tempCtx.filter = 'saturate(160%) contrast(125%)';
+      } else {
+        tempCtx.filter = 'none';
+      }
+
       if (facingMode === "user") {
         tempCtx.translate(tempCanvas.width, 0);
         tempCtx.scale(-1, 1);
@@ -327,27 +565,20 @@
 
     function compileFinalImage() {
       const context = canvas.getContext('2d');
+      const config = FRAME_CONFIGS[selectedFrameKey];
       
-      const renderWidth = 1080;
-      const renderHeight = 3240;
-      
-      canvas.width = renderWidth;
-      canvas.height = renderHeight;
+      canvas.width = config.renderWidth;
+      canvas.height = config.renderHeight;
 
       context.imageSmoothingEnabled = true;
       context.imageSmoothingQuality = 'high';
 
-      // Koordinat presisi sesuai desain Boarding Pass
-      const boxWidth = 993.8;
-      const boxHeight = 827.9;
-      const startX = 43.1;
-      const startYPositions = [140.4, 1012.7, 1885.0];
-
+      // Tempelkan tiap foto hasil tangkapan ke koordinat spesifik
       capturedPoses.forEach((poseCanvas, index) => {
-        const destY = startYPositions[index];
+        const slot = config.slots[index];
         
         const videoRatio = poseCanvas.width / poseCanvas.height;
-        const slotRatio = boxWidth / boxHeight;
+        const slotRatio = slot.w / slot.h;
         
         let sx = 0, sy = 0, sw = poseCanvas.width, sh = poseCanvas.height;
 
@@ -359,12 +590,12 @@
           sy = (poseCanvas.height - sh) / 2;
         }
 
-        context.drawImage(poseCanvas, sx, sy, sw, sh, startX, destY, boxWidth, boxHeight);
+        context.drawImage(poseCanvas, sx, sy, sw, sh, slot.x, slot.y, slot.w, slot.h);
       });
 
-      // Timpa dengan Frame PNG Boarding Pass Transparan
-      if (frameImg.complete && frameImg.naturalWidth !== 0) {
-        context.drawImage(frameImg, 0, 0, renderWidth, renderHeight);
+      // Timpa paling atas dengan Frame PNG Transparan
+      if (activeFrameImg.complete && activeFrameImg.naturalWidth !== 0) {
+        context.drawImage(activeFrameImg, 0, 0, config.renderWidth, config.renderHeight);
       }
 
       const imageData = canvas.toDataURL('image/jpeg', 0.92);
@@ -404,10 +635,9 @@
     function resetPhoto() {
       uploadStatus.innerText = "";
       resultScreen.style.display = "none";
-      boothScreen.style.display = "block";
+      boothScreen.style.display = "flex";
+      startCamera();
     }
-
-    window.onload = startCamera;
   </script>
 </body>
 </html>
