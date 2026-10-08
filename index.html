@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kathakala Photobooth - Boarding Pass 3 Pose</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f7f4f0;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px 15px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    header h1 {
+      font-family: 'Georgia', serif;
+      font-size: 1.6rem;
+      color: #4a3b32;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: #7a6a5d;
+      margin-top: 4px;
+    }
+
+    /* Wadah preview disesuaikan dengan rasio strip memanjang (1:3) */
+    .booth-container {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 1 / 3;
+      background-color: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .frame-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      object-fit: fill;
+    }
+
+    .timer-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 10;
+    }
+
+    .timer-number {
+      font-size: 5rem;
+      font-weight: bold;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+
+    .pose-indicator {
+      font-size: 1.1rem;
+      margin-top: 10px;
+      background: rgba(0,0,0,0.6);
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+
+    .controls {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .btn-capture {
+      background-color: #8c6d58;
+      color: white;
+    }
+
+    .btn-switch {
+      background-color: #e2d7cd;
+      color: #4a3b32;
+      flex: 0.35;
+    }
+
+    .result-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    canvas {
+      display: none;
+    }
+
+    #photo-result {
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .btn-download {
+      background-color: #2e7d32;
+      color: white;
+      margin-top: 15px;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 25px;
+      font-weight: 600;
+    }
+
+    .btn-retake {
+      background-color: #d32f2f;
+      color: white;
+      margin-top: 8px;
+    }
+
+    #upload-status {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Kathakala</h1>
+    <p>Virtual Photobooth — Scan, Snap & Download</p>
+  </header>
+
+  <div id="booth-screen">
+    <div class="booth-container">
+      <video id="webcam" autoplay playsinline></video>
+      <img id="frame-img" class="frame-overlay" src="frame.png" alt="Frame Boarding Pass">
+      
+      <div id="timer-overlay" class="timer-overlay">
+        <div id="timer-number" class="timer-number">3</div>
+        <div id="pose-indicator" class="pose-indicator">Pose 1 dari 3</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-switch" id="btn-flip" onclick="switchCamera()"> Flip</button>
+      <button class="btn-capture" id="btn-start" onclick="startMultiPoseSession()"> Mulai (3 Pose)</button>
+    </div>
+  </div>
+
+  <div id="result-screen" class="result-container">
+    <img id="photo-result" alt="Hasil Foto">
+    <a id="download-link" class="btn-download" download="kathakala-boardingpass.jpg"> Simpan Foto</a>
+    <button class="btn-retake" onclick="resetPhoto()"> Foto Ulang</button>
+    <p id="upload-status"></p>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('canvas');
+    const frameImg = document.getElementById('frame-img');
+    const photoResult = document.getElementById('photo-result');
+    const downloadLink = document.getElementById('download-link');
+    const boothScreen = document.getElementById('booth-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const uploadStatus = document.getElementById('upload-status');
+    const timerOverlay = document.getElementById('timer-overlay');
+    const timerNumber = document.getElementById('timer-number');
+    const poseIndicator = document.getElementById('pose-indicator');
+    const btnStart = document.getElementById('btn-start');
+    const btnFlip = document.getElementById('btn-flip');
+
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKzgjeXSZo1l7q1hGmHs7kwQSEJulvpVIOYmhvbi4drJClS0o6C_0X2sDrIkBRsCrP_A/exec";
+
+    let currentStream = null;
+    let facingMode = "user";
+    let capturedPoses = [];
+
+    async function startCamera() {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { 
+            facingMode: facingMode, 
+            width: { ideal: 1920, min: 1280 },
+            height: { ideal: 1080, min: 720 }
+          },
+          audio: false
+        });
+        currentStream = stream;
+        video.srcObject = stream;
+      } catch (err) {
+        alert("Akses kamera ditolak atau tidak didukung di browser ini.");
+        console.error(err);
+      }
+    }
+
+    function switchCamera() {
+      facingMode = facingMode === "user" ? "environment" : "user";
+      video.style.transform = facingMode === "user" ? "scaleX(-1)" : "scaleX(1)";
+      startCamera();
+    }
+
+    async function startMultiPoseSession() {
+      capturedPoses = [];
+      btnStart.disabled = true;
+      btnFlip.disabled = true;
+      timerOverlay.style.display = "flex";
+
+      for (let poseIndex = 1; poseIndex <= 3; poseIndex++) {
+        poseIndicator.innerText = `Pose ${poseIndex} dari 3`;
+        
+        for (let count = 3; count > 0; count--) {
+          timerNumber.innerText = count;
+          await delay(1000);
+        }
+
+        timerNumber.innerText = "";
+        captureSingleFrame();
+        await delay(600);
+      }
+
+      timerOverlay.style.display = "none";
+      btnStart.disabled = false;
+      btnFlip.disabled = false;
+
+      compileFinalImage();
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function captureSingleFrame() {
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      
+      tempCanvas.width = video.videoWidth;
+      tempCanvas.height = video.videoHeight;
+
+      if (facingMode === "user") {
+        tempCtx.translate(tempCanvas.width, 0);
+        tempCtx.scale(-1, 1);
+      }
+
+      tempCtx.drawImage(video, 0, 0);
+      capturedPoses.push(tempCanvas);
+    }
+
+    function compileFinalImage() {
+      const context = canvas.getContext('2d');
+      
+      // Canvas strip memanjang
+      const renderWidth = 1080;
+      const renderHeight = 3240;
+      
+      canvas.width = renderWidth;
+      canvas.height = renderHeight;
+
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = 'high';
+
+      // Parameter koordinat presisi sesuai desain Boarding Pass
+      const boxWidth = 993.8;
+      const boxHeight = 827.9;
+      const startX = 43.1;
+      
+      // Daftar koordinat Y presisi untuk 3 kotak foto
+      const startYPositions = [140.4, 1012.7, 1885.0];
+
+      capturedPoses.forEach((poseCanvas, index) => {
+        const destY = startYPositions[index];
+        
+        const videoRatio = poseCanvas.width / poseCanvas.height;
+        const slotRatio = boxWidth / boxHeight;
+        
+        let sx = 0, sy = 0, sw = poseCanvas.width, sh = poseCanvas.height;
+
+        if (videoRatio > slotRatio) {
+          sw = poseCanvas.height * slotRatio;
+          sx = (poseCanvas.width - sw) / 2;
+        } else {
+          sh = poseCanvas.width / slotRatio;
+          sy = (poseCanvas.height - sh) / 2;
+        }
+
+        context.drawImage(poseCanvas, sx, sy, sw, sh, startX, destY, boxWidth, boxHeight);
+      });
+
+      // Timpa dengan Frame PNG Boarding Pass Transparan
+      if (frameImg.complete && frameImg.naturalWidth !== 0) {
+        context.drawImage(frameImg, 0, 0, renderWidth, renderHeight);
+      }
+
+      const imageData = canvas.toDataURL('image/jpeg', 0.92);
+      photoResult.src = imageData;
+      downloadLink.href = imageData;
+
+      boothScreen.style.display = "none";
+      resultScreen.style.display = "flex";
+
+      uploadToGoogleDrive(imageData);
+    }
+
+    function uploadToGoogleDrive(base64Image) {
+      if (!GOOGLE_SCRIPT_URL) return;
+
+      uploadStatus.innerText = "Menyimpan ke album acara...";
+
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ image: base64Image }),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.result === "success") {
+          uploadStatus.innerText = " Foto tersimpan di album acara!";
+        } else {
+          uploadStatus.innerText = "";
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        uploadStatus.innerText = "";
+      });
+    }
+
+    function resetPhoto() {
+      uploadStatus.innerText = "";
+      resultScreen.style.display = "none";
+      boothScreen.style.display = "block";
+    }
+
+    window.onload = startCamera;
+  </script>
+</body>
+</html>
