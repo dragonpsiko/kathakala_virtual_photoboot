@@ -4,277 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kathakala Photobooth - Multi Frame & Filters</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background-color: #f7f4f0;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px 15px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    header h1 {
-      font-family: 'Georgia', serif;
-      font-size: 1.8rem;
-      color: #4a3b32;
-    }
-
-    header p {
-      font-size: 0.85rem;
-      color: #7a6a5d;
-      margin-top: 4px;
-    }
-
-    /* --- LAYAR 1: PILIHAN FRAME --- */
-    #selection-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 380px;
-    }
-
-    .section-title {
-      font-size: 1rem;
-      color: #4a3b32;
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-
-    .frame-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
-    .frame-card {
-      background: #ffffff;
-      border: 3px solid transparent;
-      border-radius: 12px;
-      padding: 10px;
-      text-align: center;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .frame-card.selected {
-      border-color: #8c6d58;
-      background-color: #f2ece6;
-      transform: translateY(-2px);
-    }
-
-    .frame-card img {
-      width: 100%;
-      height: 150px;
-      object-fit: contain;
-      border-radius: 6px;
-      background: #e2d7cd;
-    }
-
-    .frame-card span {
-      display: block;
-      margin-top: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #4a3b32;
-    }
-
-    /* --- LAYAR 2: BOOTH / KAMERA --- */
-    #booth-screen {
-      display: none;
-      width: 100%;
-      max-width: 340px;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .booth-container {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 3.3;
-      background-color: #000;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scaleX(-1);
-    }
-
-    /* Dynamic Filter Styles */
-    .filter-normal { filter: none; }
-    .filter-bw { filter: grayscale(100%) contrast(120%); }
-    .filter-vintage { filter: sepia(50%) contrast(105%) brightness(95%); }
-    .filter-bright { filter: brightness(115%) contrast(105%); }
-    .filter-y2k { filter: saturate(160%) contrast(125%); }
-
-    /* Flash Effect */
-    .flash-overlay {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: white;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 20;
-      transition: opacity 0.15s ease-out;
-    }
-
-    .flash-overlay.active {
-      opacity: 1;
-    }
-
-    .timer-overlay {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      z-index: 10;
-    }
-
-    .timer-number {
-      font-size: 5.5rem;
-      font-weight: bold;
-      text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    }
-
-    .pose-indicator {
-      font-size: 0.95rem;
-      margin-top: 5px;
-      background: #8c6d58;
-      color: #fff;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    /* Pilihan Filter UI */
-    .filter-selector {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-      margin-top: 12px;
-      overflow-x: auto;
-      padding-bottom: 5px;
-    }
-
-    .filter-btn {
-      flex: 0 0 auto;
-      padding: 6px 14px;
-      font-size: 0.8rem;
-      border-radius: 15px;
-      background: #e2d7cd;
-      color: #4a3b32;
-      border: 2px solid transparent;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .filter-btn.active {
-      background: #8c6d58;
-      color: white;
-      border-color: #4a3b32;
-    }
-
-    .controls {
-      margin-top: 12px;
-      display: flex;
-      gap: 10px;
-      width: 100%;
-    }
-
-    button, .btn-action {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 25px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-    }
-
-    .btn-main {
-      background-color: #8c6d58;
-      color: white;
-    }
-
-    .btn-secondary {
-      background-color: #e2d7cd;
-      color: #4a3b32;
-    }
-
-    /* --- LAYAR 3: HASIL --- */
-    #result-screen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 320px;
-    }
-
-    canvas {
-      display: none;
-    }
-
-    #photo-result {
-      width: 100%;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    }
-
-    .btn-download {
-      background-color: #2e7d32;
-      color: white;
-      margin-top: 15px;
-      display: block;
-      width: 100%;
-    }
-
-    .btn-retake {
-      background-color: #d32f2f;
-      color: white;
-      margin-top: 8px;
-      width: 100%;
-    }
-
-    #upload-status {
-      margin-top: 10px;
-      font-size: 0.8rem;
-      color: #666;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -283,32 +13,27 @@
     <p>Virtual Photobooth — Scan, Snap & Download</p>
   </header>
 
-  <!-- LAYAR 1: PILIH DESAIN FRAME -->
   <div id="selection-screen">
     <div class="section-title">Pilih Desain Frame:</div>
     
     <div class="frame-grid">
-      <!-- Frame 1: Boarding Pass -->
       <div class="frame-card selected" onclick="selectFrame('boarding_pass', this)">
-        <img src="frame.png" alt="Boarding Pass" onerror="this.src='frame.png'">
+        <img src="assets/frames/boarding_pass.png" alt="Boarding Pass">
         <span>Boarding Pass</span>
       </div>
 
-      <!-- Frame 2: Movie Ticket -->
       <div class="frame-card" onclick="selectFrame('movie_ticket', this)">
-        <img src="frame2.png" alt="Movie Ticket" onerror="this.src='frame.png'">
+        <img src="assets/frames/movie_ticket.png" alt="Movie Ticket">
         <span>Movie Ticket</span>
       </div>
 
-      <!-- Frame 3: Kathakala Mart -->
       <div class="frame-card" onclick="selectFrame('kathakala_mart', this)">
-        <img src="frame3.png" alt="Kathakala Mart" onerror="this.src='frame.png'">
+        <img src="assets/frames/kathakala_mart.png" alt="Kathakala Mart">
         <span>Kathakala Mart</span>
       </div>
 
-      <!-- Frame 4: Y2K Anti-Design -->
       <div class="frame-card" onclick="selectFrame('y2k_antidesign', this)">
-        <img src="frame4.png" alt="Y2K Anti-Design" onerror="this.src='frame.png'">
+        <img src="assets/frames/y2k_antidesign.png" alt="Y2K Style">
         <span>Y2K Style</span>
       </div>
     </div>
@@ -316,7 +41,6 @@
     <button class="btn-main" style="width: 100%;" onclick="goToBooth()">Lanjut ke Kamera 📸</button>
   </div>
 
-  <!-- LAYAR 2: KAMERA & FITUR FILTER -->
   <div id="booth-screen">
     <div class="booth-container">
       <video id="webcam" class="filter-normal" autoplay playsinline></video>
@@ -328,9 +52,11 @@
       </div>
     </div>
 
-    <!-- Pilihan Filter -->
     <div class="filter-selector">
       <button class="filter-btn active" onclick="setFilter('normal', this)">Normal</button>
+      <button class="filter-btn" onclick="setFilter('beauty', this)">Beauty Glow</button>
+      <button class="filter-btn" onclick="setFilter('radiant', this)">Radiant Pink</button>
+      <button class="filter-btn" onclick="setFilter('fuji_astia', this)">Fuji Astia</button>
       <button class="filter-btn" onclick="setFilter('bw', this)">B&W Noir</button>
       <button class="filter-btn" onclick="setFilter('vintage', this)">Vintage</button>
       <button class="filter-btn" onclick="setFilter('bright', this)">Bright</button>
@@ -344,7 +70,6 @@
     <button class="btn-secondary" style="margin-top: 10px; width: 100%;" onclick="backToSelection()">⬅️ Ganti Frame</button>
   </div>
 
-  <!-- LAYAR 3: HASIL FOTO -->
   <div id="result-screen">
     <img id="photo-result" alt="Hasil Foto">
     <a id="download-link" class="btn-action btn-download" download="kathakala-photobooth.jpg">📥 Simpan Foto</a>
@@ -354,290 +79,7 @@
 
   <canvas id="canvas"></canvas>
 
-  <script>
-    // DATA KONFIGURASI 4 FRAME
-    const FRAME_CONFIGS = {
-      "boarding_pass": {
-        name: "Boarding Pass",
-        src: "frame.png",
-        posesCount: 3,
-        renderWidth: 1080,
-        renderHeight: 3240,
-        slots: [
-          { x: 43.1, y: 140.4,  w: 993.8, h: 827.9 },
-          { x: 43.1, y: 1012.7, w: 993.8, h: 827.9 },
-          { x: 43.1, y: 1885.0, w: 993.8, h: 827.9 }
-        ]
-      },
-      "movie_ticket": {
-        name: "Movie Ticket",
-        src: "frame2.png",
-        posesCount: 3,
-        renderWidth: 1080,
-        renderHeight: 3240,
-        slots: [
-          { x: 70.9, y: 592.3,  w: 933.6, h: 732.9 },
-          { x: 70.9, y: 1356.2, w: 933.6, h: 732.9 },
-          { x: 70.9, y: 2120.1, w: 933.6, h: 732.9 }
-        ]
-      },
-      "kathakala_mart": {
-        name: "Kathakala Mart",
-        src: "frame3.png",
-        posesCount: 3,
-        renderWidth: 1080,
-        renderHeight: 3240,
-        slots: [
-          { x: 36.4, y: 512.6,  w: 1010.4, h: 828.3 },
-          { x: 36.4, y: 1370.9, w: 1010.4, h: 828.3 },
-          { x: 36.4, y: 2229.3, w: 1010.4, h: 828.3 }
-        ]
-      },
-      "y2k_antidesign": {
-        name: "Y2K Style",
-        src: "frame4.png",
-        posesCount: 3,
-        renderWidth: 1080,
-        renderHeight: 3240,
-        slots: [
-          { x: 52.7, y: 108.0,   w: 974.6, h: 790.2 },
-          { x: 46.7, y: 953.9,   w: 974.6, h: 790.2 },
-          { x: 46.7, y: 1800.2,  w: 974.6, h: 790.2 }
-        ]
-      }
-    };
-
-    const video = document.getElementById('webcam');
-    const canvas = document.getElementById('canvas');
-    const photoResult = document.getElementById('photo-result');
-    const downloadLink = document.getElementById('download-link');
-    
-    const selectionScreen = document.getElementById('selection-screen');
-    const boothScreen = document.getElementById('booth-screen');
-    const resultScreen = document.getElementById('result-screen');
-    const uploadStatus = document.getElementById('upload-status');
-    const timerOverlay = document.getElementById('timer-overlay');
-    const timerNumber = document.getElementById('timer-number');
-    const poseIndicator = document.getElementById('pose-indicator');
-    const btnStart = document.getElementById('btn-start');
-    const btnFlip = document.getElementById('btn-flip');
-    const flashEl = document.getElementById('flash');
-
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKzgjeXSZo1l7q1hGmHs7kwQSEJulvpVIOYmhvbi4drJClS0o6C_0X2sDrIkBRsCrP_A/exec";
-
-    let currentStream = null;
-    let facingMode = "user";
-    let capturedPoses = [];
-    let selectedFrameKey = "boarding_pass";
-    let activeFilter = "normal";
-    let activeFrameImg = new Image();
-
-    function selectFrame(key, cardElement) {
-      selectedFrameKey = key;
-      document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('selected'));
-      cardElement.classList.add('selected');
-    }
-
-    function setFilter(filterType, btnElement) {
-      activeFilter = filterType;
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      btnElement.classList.add('active');
-
-      video.className = `filter-${filterType}`;
-    }
-
-    function goToBooth() {
-      const config = FRAME_CONFIGS[selectedFrameKey];
-      activeFrameImg.src = config.src;
-      
-      selectionScreen.style.display = "none";
-      boothScreen.style.display = "flex";
-      startCamera();
-    }
-
-    function backToSelection() {
-      if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-      }
-      boothScreen.style.display = "none";
-      selectionScreen.style.display = "flex";
-    }
-
-    async function startCamera() {
-      if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-      }
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { 
-            facingMode: facingMode, 
-            width: { ideal: 1280 },
-            height: { ideal: 960 }
-          },
-          audio: false
-        });
-        currentStream = stream;
-        video.srcObject = stream;
-      } catch (err) {
-        alert("Akses kamera ditolak atau tidak didukung.");
-        console.error(err);
-      }
-    }
-
-    function switchCamera() {
-      facingMode = facingMode === "user" ? "environment" : "user";
-      video.style.transform = facingMode === "user" ? "scaleX(-1)" : "scaleX(1)";
-      startCamera();
-    }
-
-    async function triggerFlash() {
-      flashEl.classList.add('active');
-      await delay(150);
-      flashEl.classList.remove('active');
-    }
-
-    async function startMultiPoseSession() {
-      capturedPoses = [];
-      btnStart.disabled = true;
-      btnFlip.disabled = true;
-      timerOverlay.style.display = "flex";
-
-      const config = FRAME_CONFIGS[selectedFrameKey];
-
-      for (let poseIndex = 1; poseIndex <= config.posesCount; poseIndex++) {
-        poseIndicator.innerText = `Pose ${poseIndex} dari ${config.posesCount}`;
-        
-        for (let count = 3; count > 0; count--) {
-          timerNumber.innerText = count;
-          await delay(1000);
-        }
-
-        timerNumber.innerText = "📸";
-        await triggerFlash();
-        captureSingleFrame();
-
-        if (poseIndex < config.posesCount) {
-          poseIndicator.innerText = "Ganti Pose Berikutnya!";
-          await delay(1200);
-        }
-      }
-
-      timerOverlay.style.display = "none";
-      btnStart.disabled = false;
-      btnFlip.disabled = false;
-
-      compileFinalImage();
-    }
-
-    function delay(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    function captureSingleFrame() {
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
-      
-      tempCanvas.width = video.videoWidth;
-      tempCanvas.height = video.videoHeight;
-
-      // Filter visual ke canvas
-      if (activeFilter === 'bw') {
-        tempCtx.filter = 'grayscale(100%) contrast(120%)';
-      } else if (activeFilter === 'vintage') {
-        tempCtx.filter = 'sepia(50%) contrast(105%) brightness(95%)';
-      } else if (activeFilter === 'bright') {
-        tempCtx.filter = 'brightness(115%) contrast(105%)';
-      } else if (activeFilter === 'y2k') {
-        tempCtx.filter = 'saturate(160%) contrast(125%)';
-      } else {
-        tempCtx.filter = 'none';
-      }
-
-      if (facingMode === "user") {
-        tempCtx.translate(tempCanvas.width, 0);
-        tempCtx.scale(-1, 1);
-      }
-
-      tempCtx.drawImage(video, 0, 0);
-      capturedPoses.push(tempCanvas);
-    }
-
-    function compileFinalImage() {
-      const context = canvas.getContext('2d');
-      const config = FRAME_CONFIGS[selectedFrameKey];
-      
-      canvas.width = config.renderWidth;
-      canvas.height = config.renderHeight;
-
-      context.imageSmoothingEnabled = true;
-      context.imageSmoothingQuality = 'high';
-
-      // Tempelkan tiap foto hasil tangkapan ke koordinat spesifik
-      capturedPoses.forEach((poseCanvas, index) => {
-        const slot = config.slots[index];
-        
-        const videoRatio = poseCanvas.width / poseCanvas.height;
-        const slotRatio = slot.w / slot.h;
-        
-        let sx = 0, sy = 0, sw = poseCanvas.width, sh = poseCanvas.height;
-
-        if (videoRatio > slotRatio) {
-          sw = poseCanvas.height * slotRatio;
-          sx = (poseCanvas.width - sw) / 2;
-        } else {
-          sh = poseCanvas.width / slotRatio;
-          sy = (poseCanvas.height - sh) / 2;
-        }
-
-        context.drawImage(poseCanvas, sx, sy, sw, sh, slot.x, slot.y, slot.w, slot.h);
-      });
-
-      // Timpa paling atas dengan Frame PNG Transparan
-      if (activeFrameImg.complete && activeFrameImg.naturalWidth !== 0) {
-        context.drawImage(activeFrameImg, 0, 0, config.renderWidth, config.renderHeight);
-      }
-
-      const imageData = canvas.toDataURL('image/jpeg', 0.92);
-      photoResult.src = imageData;
-      downloadLink.href = imageData;
-
-      boothScreen.style.display = "none";
-      resultScreen.style.display = "flex";
-
-      uploadToGoogleDrive(imageData);
-    }
-
-    function uploadToGoogleDrive(base64Image) {
-      if (!GOOGLE_SCRIPT_URL) return;
-
-      uploadStatus.innerText = "Menyimpan ke album acara...";
-
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ image: base64Image }),
-        headers: { "Content-Type": "text/plain;charset=utf-8" }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if(data.result === "success") {
-          uploadStatus.innerText = "✨ Foto tersimpan di album acara!";
-        } else {
-          uploadStatus.innerText = "";
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        uploadStatus.innerText = "";
-      });
-    }
-
-    function resetPhoto() {
-      uploadStatus.innerText = "";
-      resultScreen.style.display = "none";
-      boothScreen.style.display = "flex";
-      startCamera();
-    }
-  </script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
