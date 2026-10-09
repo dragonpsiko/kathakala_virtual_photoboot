@@ -3,81 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kathakala Photobooth - Multi Frame & Filters</title>
+  <title>Kathakala — Virtual Photobooth</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <header>
-    <h1>Kathakala</h1>
-    <p>Virtual Photobooth — Scan, Snap & Download</p>
-  </header>
-
-  <div id="selection-screen">
-    <div class="section-title">Pilih Desain Frame:</div>
+  <main class="app-container">
     
-    <div class="frame-grid">
-      <div class="frame-card selected" onclick="selectFrame('boarding_pass', this)">
-        <img src="assets/frames/boarding_pass.png" alt="Boarding Pass">
-        <span>Boarding Pass</span>
-      </div>
-
-      <div class="frame-card" onclick="selectFrame('movie_ticket', this)">
-        <img src="assets/frames/movie_ticket.png" alt="Movie Ticket">
-        <span>Movie Ticket</span>
-      </div>
-
-      <div class="frame-card" onclick="selectFrame('kathakala_mart', this)">
-        <img src="assets/frames/kathakala_mart.png" alt="Kathakala Mart">
-        <span>Kathakala Mart</span>
-      </div>
-
-      <div class="frame-card" onclick="selectFrame('y2k_antidesign', this)">
-        <img src="assets/frames/y2k_antidesign.png" alt="Y2K Style">
-        <span>Y2K Style</span>
-      </div>
-    </div>
-
-    <button class="btn-main" style="width: 100%;" onclick="goToBooth()">Lanjut ke Kamera 📸</button>
-  </div>
-
-  <div id="booth-screen">
-    <div class="booth-container">
-      <video id="webcam" class="filter-normal" autoplay playsinline></video>
-      <div id="flash" class="flash-overlay"></div>
+    <section id="landing-screen" class="screen active">
+      <div class="brand-badge">✨ Kathakala Story</div>
+      <h1 class="hero-title">Abadikan Momen,<br><em>Di Mana Saja.</em></h1>
       
-      <div id="timer-overlay" class="timer-overlay">
-        <div id="timer-number" class="timer-number">3</div>
-        <div id="pose-indicator" class="pose-indicator">Siap-siap Pose 1</div>
+      <p class="hero-description">
+        Selamat datang di <strong>Kathakala Virtual Photobooth</strong>. Tempat kamu mengabadikan cerita kecil, pose terbaik, dan kenangan estetis langsung dari kameramu tanpa batas tempat.
+      </p>
+
+      <div class="features-pill">
+        <span>📸 Multi-Pose</span>
+        <span>🎞️ Preset Frame</span>
+        <span>🎨 Fuji Film LUT</span>
       </div>
-    </div>
 
-    <div class="filter-selector">
-      <button class="filter-btn active" onclick="setFilter('normal', this)">Normal</button>
-      <button class="filter-btn" onclick="setFilter('beauty', this)">Beauty Glow</button>
-      <button class="filter-btn" onclick="setFilter('radiant', this)">Radiant Pink</button>
-      <button class="filter-btn" onclick="setFilter('fuji_astia', this)">Fuji Astia</button>
-      <button class="filter-btn" onclick="setFilter('bw', this)">B&W Noir</button>
-      <button class="filter-btn" onclick="setFilter('vintage', this)">Vintage</button>
-      <button class="filter-btn" onclick="setFilter('bright', this)">Bright</button>
-      <button class="filter-btn" onclick="setFilter('y2k', this)">Y2K Vivid</button>
-    </div>
+      <button class="btn-primary" onclick="goToSelection()">
+        Coba Photobooth Sekarang ⚡
+      </button>
 
-    <div class="controls">
-      <button class="btn-secondary" style="flex: 0.35;" id="btn-flip" onclick="switchCamera()">🔄 Flip</button>
-      <button class="btn-main" id="btn-start" onclick="startMultiPoseSession()">📸 Mulai (3 Pose)</button>
-    </div>
-    <button class="btn-secondary" style="margin-top: 10px; width: 100%;" onclick="backToSelection()">⬅️ Ganti Frame</button>
-  </div>
+      <footer class="landing-footer">
+        <p>© Kathakala. All memories reserved.</p>
+      </footer>
+    </section>
 
-  <div id="result-screen">
-    <img id="photo-result" alt="Hasil Foto">
-    <a id="download-link" class="btn-action btn-download" download="kathakala-photobooth.jpg">📥 Simpan Foto</a>
-    <button class="btn-retake" onclick="resetPhoto()">🔄 Foto Ulang</button>
-    <p id="upload-status"></p>
-  </div>
+    <section id="selection-screen" class="screen">
+      <header class="section-header">
+        <button class="btn-back-text" onclick="goToLanding()">← Kembali</button>
+        <h2>Pilih Desain Frame</h2>
+        <p>Sesuaikan mood foto dengan vibe frame favoritmu.</p>
+      </header>
+      
+      <div class="frame-grid">
+        <div class="frame-card selected" onclick="selectFrame('boarding_pass', this)">
+          <div class="img-wrapper">
+            <img src="assets/frames/boarding_pass.png" alt="Boarding Pass">
+          </div>
+          <span>Boarding Pass</span>
+        </div>
 
-  <canvas id="canvas"></canvas>
+        <div class="frame-card" onclick="selectFrame('movie_ticket', this)">
+          <div class="img-wrapper">
+            <img src="assets/frames/movie_ticket.png" alt="Movie Ticket">
+          </div>
+          <span>Movie Ticket</span>
+        </div>
+
+        <div class="frame-card" onclick="selectFrame('kathakala_mart', this)">
+          <div class="img-wrapper">
+            <img src="assets/frames/kathakala_mart.png" alt="Kathakala Mart">
+          </div>
+          <span>Kathakala Mart</span>
+        </div>
+
+        <div class="frame-card" onclick="selectFrame('y2k_antidesign', this)">
+          <div class="img-wrapper">
+            <img src="assets/frames/y2k_antidesign.png" alt="Y2K Style">
+          </div>
+          <span>Y2K Style</span>
+        </div>
+      </div>
+
+      <button class="btn-primary full-width" onclick="goToBooth()">Lanjut ke Kamera 📸</button>
+    </section>
+
+    <section id="booth-screen" class="screen">
+      <div class="booth-container">
+        <video id="webcam" class="filter-normal" autoplay playsinline></video>
+        <div id="flash" class="flash-overlay"></div>
+        
+        <div id="timer-overlay" class="timer-overlay">
+          <div id="timer-number" class="timer-number">3</div>
+          <div id="pose-indicator" class="pose-indicator">Siap-siap Pose 1</div>
+        </div>
+      </div>
+
+      <div class="filter-selector">
+        <button class="filter-btn active" onclick="setFilter('normal', this)">Normal</button>
+        <button class="filter-btn" onclick="setFilter('beauty', this)">Beauty Glow ✨</button>
+        <button class="filter-btn" onclick="setFilter('radiant', this)">Radiant Pink</button>
+        <button class="filter-btn" onclick="setFilter('fuji_astia', this)">Fuji Astia 📷</button>
+        <button class="filter-btn" onclick="setFilter('bw', this)">B&W Noir</button>
+        <button class="filter-btn" onclick="setFilter('vintage', this)">Vintage</button>
+        <button class="filter-btn" onclick="setFilter('bright', this)">Bright</button>
+        <button class="filter-btn" onclick="setFilter('y2k', this)">Y2K Vivid</button>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn-secondary flex-04" id="btn-flip" onclick="switchCamera()">🔄 Flip</button>
+        <button class="btn-primary flex-1" id="btn-start" onclick="startMultiPoseSession()">📸 Mulai Jepret</button>
+      </div>
+      <button class="btn-ghost" onclick="backToSelection()">← Ganti Frame</button>
+    </section>
+
+    <section id="result-screen" class="screen">
+      <div class="result-header">
+        <h2>Yeay, Foto Kamu Jadi! 🎉</h2>
+        <p>Simpan atau foto ulang kalau merasa belum pas.</p>
+      </div>
+      <div class="result-card">
+        <img id="photo-result" alt="Hasil Foto">
+      </div>
+      <a id="download-link" class="btn-primary full-width" download="kathakala-photobooth.jpg">📥 Download Foto</a>
+      <button class="btn-secondary full-width" onclick="resetPhoto()">🔄 Foto Ulang</button>
+      <p id="upload-status"></p>
+    </section>
+
+    <canvas id="canvas"></canvas>
+  </main>
 
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
