@@ -211,13 +211,14 @@ body {
 
 .img-wrapper {
   width: 100%;
-  height: 140px;
+  aspect-ratio: 1 / 3;
   background: #EBE7DF;
   border-radius: var(--radius-sm);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 4px;
 }
 
 .img-wrapper img {
