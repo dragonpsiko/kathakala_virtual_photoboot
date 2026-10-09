@@ -1,4 +1,3 @@
-// DATA KONFIGURASI 4 FRAME
 const FRAME_CONFIGS = {
   "boarding_pass": {
     name: "Boarding Pass",
@@ -7,9 +6,9 @@ const FRAME_CONFIGS = {
     renderWidth: 1080,
     renderHeight: 3240,
     slots: [
-      { x: 43.1, y: 140.4,  w: 993.8, h: 827.9 },
-      { x: 43.1, y: 1012.7, w: 993.8, h: 827.9 },
-      { x: 43.1, y: 1885.0, w: 993.8, h: 827.9 }
+      { x: 54, y: 180, w: 972, h: 810 },
+      { x: 54, y: 1125, w: 972, h: 810 },
+      { x: 54, y: 2070, w: 972, h: 810 }
     ]
   },
   "movie_ticket": {
@@ -19,9 +18,9 @@ const FRAME_CONFIGS = {
     renderWidth: 1080,
     renderHeight: 3240,
     slots: [
-      { x: 70.9, y: 592.3,  w: 933.6, h: 732.9 },
-      { x: 70.9, y: 1356.2, w: 933.6, h: 732.9 },
-      { x: 70.9, y: 2120.1, w: 933.6, h: 732.9 }
+      { x: 54, y: 180, w: 972, h: 810 },
+      { x: 54, y: 1125, w: 972, h: 810 },
+      { x: 54, y: 2070, w: 972, h: 810 }
     ]
   },
   "kathakala_mart": {
@@ -31,9 +30,9 @@ const FRAME_CONFIGS = {
     renderWidth: 1080,
     renderHeight: 3240,
     slots: [
-      { x: 36.4, y: 512.6,  w: 1010.4, h: 828.3 },
-      { x: 36.4, y: 1370.9, w: 1010.4, h: 828.3 },
-      { x: 36.4, y: 2229.3, w: 1010.4, h: 828.3 }
+      { x: 54, y: 180, w: 972, h: 810 },
+      { x: 54, y: 1125, w: 972, h: 810 },
+      { x: 54, y: 2070, w: 972, h: 810 }
     ]
   },
   "y2k_antidesign": {
@@ -43,9 +42,9 @@ const FRAME_CONFIGS = {
     renderWidth: 1080,
     renderHeight: 3240,
     slots: [
-      { x: 52.7, y: 108.0,   w: 974.6, h: 790.2 },
-      { x: 46.7, y: 953.9,   w: 974.6, h: 790.2 },
-      { x: 46.7, y: 1800.2,  w: 974.6, h: 790.2 }
+      { x: 54, y: 180, w: 972, h: 810 },
+      { x: 54, y: 1125, w: 972, h: 810 },
+      { x: 54, y: 2070, w: 972, h: 810 }
     ]
   },
   "kathakala_music": {
@@ -95,5 +94,5 @@ const FRAME_CONFIGS = {
       { x: 29.6, y: 1156.4, w: 1010.9, h: 927.3 },
       { x: 29.6, y: 2154.4, w: 1010.9, h: 927.3 }
     ]
-  }  
+  }
 };
