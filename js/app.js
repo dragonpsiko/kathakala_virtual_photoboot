@@ -1,11 +1,14 @@
+// ELEMEN DOM
+const landingScreen = document.getElementById('landing-screen');
+const selectionScreen = document.getElementById('selection-screen');
+const boothScreen = document.getElementById('booth-screen');
+const resultScreen = document.getElementById('result-screen');
+
 const video = document.getElementById('webcam');
 const canvas = document.getElementById('canvas');
 const photoResult = document.getElementById('photo-result');
 const downloadLink = document.getElementById('download-link');
 
-const selectionScreen = document.getElementById('selection-screen');
-const boothScreen = document.getElementById('booth-screen');
-const resultScreen = document.getElementById('result-screen');
 const uploadStatus = document.getElementById('upload-status');
 const timerOverlay = document.getElementById('timer-overlay');
 const timerNumber = document.getElementById('timer-number');
@@ -53,6 +56,23 @@ function loadLUT(lutName, src) {
 // Preload LUT Fujifilm Astia
 loadLUT('fuji_astia', 'assets/luts/fuji_astia.png');
 
+// --- NAVIGASI LAYAR ---
+function showScreen(screenElement) {
+  document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+  screenElement.classList.add('active');
+}
+
+function goToLanding() {
+  if (currentStream) {
+    currentStream.getTracks().forEach(track => track.stop());
+  }
+  showScreen(landingScreen);
+}
+
+function goToSelection() {
+  showScreen(selectionScreen);
+}
+
 function selectFrame(key, cardElement) {
   selectedFrameKey = key;
   document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('selected'));
@@ -71,8 +91,7 @@ function goToBooth() {
   const config = FRAME_CONFIGS[selectedFrameKey];
   activeFrameImg.src = config.src;
   
-  selectionScreen.style.display = "none";
-  boothScreen.style.display = "flex";
+  showScreen(boothScreen);
   startCamera();
 }
 
@@ -80,10 +99,10 @@ function backToSelection() {
   if (currentStream) {
     currentStream.getTracks().forEach(track => track.stop());
   }
-  boothScreen.style.display = "none";
-  selectionScreen.style.display = "flex";
+  showScreen(selectionScreen);
 }
 
+// --- LOGIKA KAMERA ---
 async function startCamera() {
   if (currentStream) {
     currentStream.getTracks().forEach(track => track.stop());
@@ -162,7 +181,7 @@ function captureSingleFrame() {
   tempCanvas.width = video.videoWidth;
   tempCanvas.height = video.videoHeight;
 
-  // Terapkan efek filter saat penangkapan gambar
+  // Filter standar & skin smoothing
   if (activeFilter === 'beauty') {
     tempCtx.filter = 'brightness(1.12) contrast(0.98) saturate(1.08) sepia(0.05)';
   } else if (activeFilter === 'radiant') {
@@ -188,6 +207,7 @@ function captureSingleFrame() {
   capturedPoses.push(tempCanvas);
 }
 
+// Processing Hald CLUT
 function applyHaldLUT(targetCanvas, lutName) {
   const lut = lutCache[lutName];
   if (!lut) return;
@@ -217,6 +237,7 @@ function applyHaldLUT(targetCanvas, lutName) {
   ctx.putImageData(imgData, 0, 0);
 }
 
+// --- REKAP DAN HASIL FOTO ---
 function compileFinalImage() {
   const context = canvas.getContext('2d');
   const config = FRAME_CONFIGS[selectedFrameKey];
@@ -258,8 +279,7 @@ function compileFinalImage() {
   photoResult.src = imageData;
   downloadLink.href = imageData;
 
-  boothScreen.style.display = "none";
-  resultScreen.style.display = "flex";
+  showScreen(resultScreen);
 
   uploadToGoogleDrive(imageData);
 }
@@ -290,8 +310,6 @@ function uploadToGoogleDrive(base64Image) {
 
 function resetPhoto() {
   uploadStatus.innerText = "";
-  resultScreen.style.display = "none";
-  boothScreen.style.display = "flex";
+  showScreen(boothScreen);
   startCamera();
     }
-  
