@@ -47,5 +47,53 @@ const FRAME_CONFIGS = {
       { x: 46.7, y: 953.9,   w: 974.6, h: 790.2 },
       { x: 46.7, y: 1800.2,  w: 974.6, h: 790.2 }
     ]
-  }
+  },
+  "kathakala_music": {
+    name: "Kathakala Music",
+    src: "assets/frames/kathakala_music.png",
+    posesCount: 3,
+    renderWidth: 1080,
+    renderHeight: 3240,
+    slots: [
+      { x: 108, y: 196.3,  w: 864, h: 738.1 },
+      { x: 108, y: 986.7,  w: 864, h: 738.1 },
+      { x: 108, y: 1777.1, w: 864, h: 738.1 }
+    ]
+  },
+  "y2k_v2": {
+    name: "Y2K Style V2",
+    src: "assets/frames/y2k_v2.png",
+    posesCount: 4,
+    renderWidth: 1080,
+    renderHeight: 3240,
+    slots: [
+      { x: 41.6, y: 89.1,   w: 996.9, h: 728.5 },
+      { x: 38.1, y: 860.3,  w: 996.9, h: 728.5 },
+      { x: 34.5, y: 1631.5, w: 996.9, h: 728.5 },
+      { x: 31.0, y: 2402.7, w: 996.9, h: 728.5 }
+    ]
+  },
+  "instagram": {
+    name: "Instagram Post",
+    src: "assets/frames/instagram.png",
+    posesCount: 2,
+    renderWidth: 1080,
+    renderHeight: 3240,
+    slots: [
+      { x: 24.6, y: 451.4,  w: 1031.6, h: 1067.9 },
+      { x: 24.6, y: 1837.5, w: 1031.6, h: 1067.9 }
+    ]
+  },
+  "instagram_v2": {
+    name: "Instagram V2",
+    src: "assets/frames/instagram_v2.png",
+    posesCount: 3,
+    renderWidth: 1080,
+    renderHeight: 3240,
+    slots: [
+      { x: 29.6, y: 158.3,  w: 1010.9, h: 927.3 },
+      { x: 29.6, y: 1156.4, w: 1010.9, h: 927.3 },
+      { x: 29.6, y: 2154.4, w: 1010.9, h: 927.3 }
+    ]
+  }  
 };
