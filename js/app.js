@@ -8,6 +8,7 @@ const video = document.getElementById('webcam');
 const canvas = document.getElementById('canvas');
 const photoResult = document.getElementById('photo-result');
 const downloadLink = document.getElementById('download-link');
+const btnShare = document.getElementById('btn-share');
 
 const uploadStatus = document.getElementById('upload-status');
 const timerOverlay = document.getElementById('timer-overlay');
@@ -284,6 +285,53 @@ function compileFinalImage() {
   uploadToGoogleDrive(imageData);
 }
 
+// --- FIX KHUSUS DOWNLOAD DI IPHONE (SAFARI) ---
+if (downloadLink) {
+  downloadLink.addEventListener('click', (e) => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    if (isIOS) {
+      e.preventDefault();
+      const imageData = photoResult.src;
+      let w = window.open('');
+      if (w) {
+        w.document.write(`
+          <html>
+            <head><title>Simpan Foto</title></head>
+            <body style="margin:0; background:#111; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; color:#fff; font-family:sans-serif; text-align:center; padding: 20px;">
+              <p style="margin-bottom:15px; font-size:15px; line-height: 1.4;">Tekan dan tahan (long-press) gambar di bawah ini, lalu pilih <b>"Simpan ke Foto"</b></p>
+              <img src="${imageData}" style="max-width:100%; max-height:75vh; border-radius:12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);" />
+            </body>
+          </html>
+        `);
+      }
+    }
+  });
+}
+
+// --- FITUR SHARE KE MEDIA SOSIAL ---
+if (btnShare) {
+  btnShare.addEventListener('click', async () => {
+    const shareData = {
+      title: 'Kathakala Virtual Photobooth',
+      text: 'Seru banget cobain virtual photobooth di Kathakala! Buat frame estetikmu sendiri yuk di sini:',
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        const fullText = `${shareData.text} ${shareData.url}`;
+        await navigator.clipboard.writeText(fullText);
+        alert('Link dan teks ajakan berhasil disalin! Silakan tempel (paste) ke Instagram Stories atau WhatsApp kamu.');
+      }
+    } catch (err) {
+      console.log('Error saat membagikan:', err);
+    }
+  });
+}
+
 function uploadToGoogleDrive(base64Image) {
   if (!GOOGLE_SCRIPT_URL) return;
 
@@ -312,4 +360,4 @@ function resetPhoto() {
   uploadStatus.innerText = "";
   showScreen(boothScreen);
   startCamera();
-    }
+}
